@@ -26,13 +26,17 @@ def display_results(start_date, end_date, page):
     if not papers:
         return """
         <p style="
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 1.2em;
             text-align: center;
-            color: #555;
-            margin-top: 40px;
+            color: #64748b;
+            margin-top: 60px;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         ">
-            <span style="font-weight: 700; font-size: 2em; color:#6f42c1;">No</span> papers found for the selected date range.
+            <span style="font-weight: 700; font-size: 2em; color:#ea580c;">No</span> papers found for the selected date range.
         </p>
         """
  
@@ -52,20 +56,20 @@ def display_results(start_date, end_date, page):
             pdf_html = "<p>No PDF Available</p>"
  
         formatted_html += f"""
-        <div style="
-            display: flex; background: #f2f2f9; border: 2px solid #c4c4ff;
-            padding: 15px; margin-bottom: 20px; border-radius: 10px;
-            font-family: 'Roboto', sans-serif;
-        ">
-            <div style="width: 65%; padding-right: 15px;">
-                <h2 style="color: #2a2a75; margin-bottom: 10px; font-size: 1.6em;">
-                    <a href="{link_alt}" target="_blank" style="text-decoration:none; color:#2a2a75;">{title}</a>
-                </h2>
-                <p style="margin-bottom: 6px;"><strong>Authors:</strong> {authors}</p>
-                <p style="margin-bottom: 6px;"><strong>Submitted:</strong> {submitted_date}</p>
-                <p style="margin-bottom: 6px;"><strong>Summary:</strong> {summary}</p>
+        <div class="paper-card" style="display: flex; gap: 32px;">
+            <div style="flex: 1; min-width: 0;">
+                <a href="{link_alt}" target="_blank" class="paper-title">{title}</a>
+                <div class="paper-meta">
+                    <strong>Authors:</strong> {authors}
+                </div>
+                <div class="paper-meta">
+                    <strong>Submitted:</strong> {submitted_date}
+                </div>
+                <div class="paper-summary">
+                    <strong>Summary:</strong> {summary}
+                </div>
             </div>
-            <div style="width: 35%; display: flex; justify-content: flex-end;">
+            <div style="width: 450px;" class="pdf-container">
                 {pdf_html}
             </div>
         </div>
