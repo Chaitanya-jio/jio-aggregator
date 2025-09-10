@@ -9,130 +9,193 @@ from utils.ai import search_papers_ai, on_page_change_ai
 from utils.blockchain import search_papers_b, on_page_change_b
 from utils.all import search_papers_all, on_page_change_all
 
-# replace your js string with this:
-js = """
-function switchToTabFromURL() {
+# Tab switching JavaScript
+tab_switching_js = """
+() => {
   try {
-    const params = new URLSearchParams(window.location.search);
-    const wanted = params.get("tab");
+    var params = new URLSearchParams(window.location.search);
+    var wanted = params.get("tab");
     if (!wanted) return;
 
-    console.log(`Attempting to switch to tab: ${wanted}`);
+    console.log("🎯 Attempting to switch to tab: " + wanted);
 
-    // map short keys -> actual tab labels shown in the UI
-    const map = {
+    // Simple tab mapping
+    var tabMap = {
       wildfire: "Wildfire prediction and forecasting using Deep learning",
-      quantum_computing: "Quantum Computing",
+      quantum_computing: "Quantum Computing", 
       ai: "Artificial Intelligence",
       web3_blockchain: "Web3 and Blockchain",
-      web3: "Web3 and Blockchain",  // alias for web3_blockchain
-      all: "All",
+      web3: "Web3 and Blockchain",
+      all: "All"
     };
 
-    const wantedLabel = map[wanted] || wanted;
-    console.log(`Looking for tab with label: "${wantedLabel}"`);
+    var targetLabel = tabMap[wanted];
+    if (!targetLabel) {
+      console.log("❌ Unknown tab parameter: " + wanted);
+      return;
+    }
 
-    // Wait for tabs to be ready
-    const findAndClickTab = () => {
-      const tabs = Array.from(document.querySelectorAll("[role='tab']"));
-      console.log(`Found ${tabs.length} tabs:`, tabs.map(t => `"${t.innerText.trim()}"`));
+    console.log("🔍 Looking for tab: " + targetLabel);
+
+    // Enhanced tab finder with multiple selectors
+    var findAndClickTab = function() {
+      console.log("🔍 Searching for tabs with multiple selectors...");
       
-      if (tabs.length === 0) {
-        console.log("No tabs found, retrying...");
-        return false;
-      }
-
-      const slug = s => (s || "")
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "_")
-        .replace(/^_|_$/g, "");
-
-      // try exact match, case-insensitive, slug match, and prefix match
-      let btn =
-        tabs.find(t => t.innerText.trim() === wantedLabel) ||
-        tabs.find(t => t.innerText.trim().toLowerCase() === wantedLabel.toLowerCase()) ||
-        tabs.find(t => slug(t.innerText) === slug(wantedLabel)) ||
-        tabs.find(t => slug(t.innerText).startsWith(slug(wanted)));
-
-      if (btn) {
-        btn.click();
-        console.log(`✅ Successfully switched to tab: "${btn.innerText.trim()}" from URL parameter: ${wanted}`);
-        return true;
-      } else {
-        console.log(`❌ Tab not found for URL parameter: ${wanted}`);
-        console.log(`Available tabs:`, tabs.map(t => `"${t.innerText.trim()}"`));
-        return false;
-      }
-    };
-
-    // Try immediately
-    if (findAndClickTab()) return;
-
-    // If not found, retry with delays
-    setTimeout(() => {
-      if (findAndClickTab()) return;
+      // Try multiple selectors for Gradio tabs
+      var selectors = [
+        'button[role="tab"]',
+        '[role="tab"]', 
+        'button.tab-nav',
+        '.tab-nav button',
+        'button:has-text("' + targetLabel + '")',
+        'button'
+      ];
       
-      setTimeout(() => {
-        findAndClickTab();
-      }, 1000);
-    }, 500);
-
-  } catch (e) {
-    console.log("tab init error", e);
-  }
-}
-
-// Call the function immediately
-switchToTabFromURL();
-
-// Test function to verify all tab routes work
-function testAllTabRoutes() {
-  const testRoutes = [
-    'wildfire',
-    'quantum_computing', 
-    'ai',
-    'web3_blockchain',
-    'web3',
-    'all'
-  ];
-  
-  console.log('🧪 Testing all tab routes...');
-  testRoutes.forEach(route => {
-    const params = new URLSearchParams();
-    params.set('tab', route);
-    console.log(`Testing route: ?tab=${route}`);
-  });
-}
-
-// Function to update URL when tab is clicked
-function updateURLOnTabChange() {
-  try {
-    const tabs = Array.from(document.querySelectorAll("[role='tab']"));
-    
-    // Reverse mapping: tab labels -> URL parameters
-    const reverseMap = {
-      "Wildfire prediction and forecasting using Deep learning": "wildfire",
-      "Quantum Computing": "quantum_computing", 
-      "Artificial Intelligence": "ai",
-      "Web3 and Blockchain": "web3",
-      "All": "all"
-    };
-    
-    tabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        const tabText = tab.innerText.trim();
-        const urlParam = reverseMap[tabText];
-        
-        if (urlParam) {
-          const newUrl = new URL(window.location);
-          newUrl.searchParams.set('tab', urlParam);
-          window.history.replaceState({}, '', newUrl.toString());
-          console.log(`Updated URL to: ${newUrl.toString()}`);
+      var allButtons = [];
+      selectors.forEach(function(selector) {
+        try {
+          var buttons = Array.from(document.querySelectorAll(selector));
+          allButtons = allButtons.concat(buttons);
+          console.log("Selector '" + selector + "' found " + buttons.length + " elements");
+        } catch (e) {
+          console.log("Selector '" + selector + "' failed: " + e.message);
         }
       });
-    });
+      
+      // Remove duplicates
+      allButtons = allButtons.filter(function(item, index) {
+        return allButtons.indexOf(item) === index;
+      });
+      
+      console.log("Total unique buttons/tabs found: " + allButtons.length);
+      
+      // Log all available tab texts for debugging
+      console.log("Available tab texts: [" + 
+        allButtons.map(function(btn) { 
+          return '"' + (btn.innerText ? btn.innerText.trim() : btn.textContent ? btn.textContent.trim() : 'no-text') + '"'; 
+        }).join(', ') + "]"
+      );
+      
+      // Try exact match first
+      var tabButton = allButtons.find(function(btn) {
+        var text = btn.innerText || btn.textContent || '';
+        return text.trim() === targetLabel;
+      });
+      
+      // Try keyword match if exact fails
+      if (!tabButton) {
+        console.log("🔄 Exact match failed, trying keyword matching...");
+        tabButton = allButtons.find(function(btn) {
+          var text = (btn.innerText || btn.textContent || '').toLowerCase();
+          if (wanted === 'quantum_computing' && text.includes('quantum')) return true;
+          if (wanted === 'ai' && text.includes('artificial')) return true;
+          if (wanted === 'web3' && (text.includes('web3') || text.includes('blockchain'))) return true;
+          if (wanted === 'wildfire' && text.includes('wildfire')) return true;
+          if (wanted === 'all' && text.trim() === 'all') return true;
+          return false;
+        });
+      }
+      
+      if (tabButton) {
+        console.log("✅ Found tab: " + (tabButton.innerText || tabButton.textContent).trim());
+        console.log("🖱️ Clicking tab...");
+        
+        // Try multiple click methods
+        try {
+          tabButton.click();
+          console.log("✅ Standard click executed");
+        } catch (e) {
+          console.log("❌ Standard click failed: " + e.message);
+          try {
+            tabButton.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+            console.log("✅ MouseEvent click executed");
+          } catch (e2) {
+            console.log("❌ MouseEvent click failed: " + e2.message);
+          }
+        }
+        
+        return true;
+      }
+
+      console.log("❌ Tab '" + targetLabel + "' not found in " + allButtons.length + " buttons");
+      return false;
+    };
+
+    // Wait 2 seconds then try to find and click tab, with retries
+    console.log("⏳ Waiting 2 seconds for page to load...");
+    
+    var attempts = 0;
+    var maxAttempts = 3;
+    
+    var tryTabSwitch = function() {
+      attempts++;
+      console.log("🔄 Attempt " + attempts + "/" + maxAttempts + " to find and click tab");
+      
+      if (findAndClickTab()) {
+        console.log("🎉 Success on attempt " + attempts + "!");
+        return;
+      }
+      
+      if (attempts < maxAttempts) {
+        console.log("⏳ Retrying in 1 second...");
+        tryTabSwitch();
+      } else {
+        console.log("❌ Failed after " + maxAttempts + " attempts");
+      }
+    };
+    tryTabSwitch();
+
   } catch (e) {
-    console.log("URL update setup error", e);
+    console.error("❌ Tab switching error:", e);
+  }
+}
+"""
+
+# Footer loading JavaScript
+footer_loading_js = """
+() => {
+  try {
+    console.log("📄 Footer loader initialized");
+    
+    // Load footer after 2 seconds
+    setTimeout(function() {
+        console.log("⏳ Loading footer after 2 seconds...");
+        
+        var footerPlaceholder = document.getElementById('footer-placeholder');
+        if (footerPlaceholder) {
+            footerPlaceholder.innerHTML = `
+                <footer class="custom-footer">
+                    <div class="footer-content">
+                        <div class="footer-logo">
+                            <img src="https://moonshotmatter.com/wp-content/uploads/2025/09/Screenshot-2025-09-05-at-2.58.24%E2%80%AFPM.png" 
+                                 alt="MoonShotMatter Logo" class="footer-logo-img">
+                        </div>
+                        <div class="footer-nav">
+                            <div class="footer-section">
+                                <h4>Menu</h4>
+                                <ul>
+                                    <li><a href="https://www.moonshotmatter.com">Home</a></li>
+                                    <li><a href="https://research.moonshotmatter.com">Research</a></li>
+                                    <li><a href="https://trends.moonshotmatter.com">Trends</a></li>
+                                    <li><a href="https://blog.moonshotmatter.com">Blog</a></li>
+                                    <li><a href="https://moonshotmatter.com/company/contact-us/">Contact us</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footer-bottom">
+                        <p>©2025 MoonShotMatter, All Rights Reserved.</p>
+                    </div>
+                </footer>
+            `;
+            console.log("✅ Footer loaded successfully!");
+        } else {
+            console.log("❌ Footer placeholder not found");
+        }
+    }, 2000);
+    
+  } catch (e) {
+    console.error("❌ Footer loading error:", e);
   }
 }
 """
@@ -329,39 +392,22 @@ with gr.Blocks(
         scroll_to_output=False
     )
 
-    # Footer
-    gr.HTML("""
-        <footer class="custom-footer">
-            <div class="footer-content">
-                <div class="footer-logo">
-                    <img src="https://moonshotmatter.com/wp-content/uploads/2025/09/Screenshot-2025-09-05-at-2.58.24%E2%80%AFPM.png" 
-                         alt="MoonShotMatter Logo" class="footer-logo-img">
-                </div>
-                <div class="footer-nav">
-                    <div class="footer-section">
-                        <h4>Menu</h4>
-                        <ul>
-                            <li><a href="https://www.moonshotmatter.com">Home</a></li>
-                            <li><a href="https://research.moonshotmatter.com">Research</a></li>
-                            <li><a href="https://trends.moonshotmatter.com">Trends</a></li>
-                            <li><a href="https://blog.moonshotmatter.com">Blog</a></li>
-                            <li><a href="https://moonshotmatter.com/company/contact-us/">Contact us</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>©2025 MoonShotMatter, All Rights Reserved.</p>
-            </div>
-        </footer>
-    """)
+    # Footer placeholder - will be loaded via JavaScript after 2 seconds
+    gr.HTML('<div id="footer-placeholder"></div>')
 
-    demo.load(None, js=js + """
+    # Load tab switching JavaScript
+    demo.load(None, js=tab_switching_js)
+    
+    # Load footer loading JavaScript  
+    demo.load(None, js=footer_loading_js)
+    
+    # Load CSS and layout management JavaScript
+    demo.load(None, js="""
     // Enhanced CSS and layout management
-    function ensureCustomStyling() {
+    var ensureCustomStyling = function() {
         // Force full width and remove padding on load, but preserve tabs
-        const containers = document.querySelectorAll('.gradio-container, .app, .fillable, .main-wrap, .wrap, .contain, .main, .block, .form, div[data-testid="block-container"]');
-        containers.forEach(el => {
+        var containers = document.querySelectorAll('.gradio-container, .app, .fillable, .main-wrap, .wrap, .contain, .main, .block, .form, div[data-testid="block-container"]');
+        containers.forEach(function(el) {
             el.style.maxWidth = 'none';
             el.style.width = '100%';
             el.style.padding = '0';
@@ -369,83 +415,34 @@ with gr.Blocks(
         });
         
         // Ensure tabs are visible and functional
-        const tabs = document.querySelectorAll('[role="tablist"], [role="tab"], [role="tabpanel"], .tabitem');
-        tabs.forEach(tab => {
+        var tabs = document.querySelectorAll('[role="tablist"], [role="tab"], [role="tabpanel"], .tabitem');
+        tabs.forEach(function(tab) {
             tab.style.display = tab.getAttribute('role') === 'tablist' ? 'flex' : 'block';
             tab.style.visibility = 'visible';
         });
         
         // Ensure custom CSS takes priority by moving it to the end
-        const customCSS = document.getElementById('custom-css-override');
+        var customCSS = document.getElementById('custom-css-override');
         if (customCSS) {
             document.head.appendChild(customCSS);
         }
         
         // Hide Gradio default footer and social media elements
-        const gradioFooter = document.querySelector('footer');
+        var gradioFooter = document.querySelector('footer');
         if (gradioFooter && !gradioFooter.classList.contains('custom-footer')) {
             gradioFooter.style.display = 'none';
         }
         
         // Remove any social media links or go-to-top buttons that might be added by Gradio
-        const socialElements = document.querySelectorAll('a[href*="twitter"], a[href*="linkedin"], a[href*="youtube"], a[href*="instagram"], a[href*="facebook"], .scroll-to-top, .go-to-top');
-        socialElements.forEach(el => el.style.display = 'none');
+        var socialElements = document.querySelectorAll('a[href*="twitter"], a[href*="linkedin"], a[href*="youtube"], a[href*="instagram"], a[href*="facebook"], .scroll-to-top, .go-to-top');
+        socialElements.forEach(function(el) { el.style.display = 'none'; });
         
         // Add additional runtime overrides that come after all other CSS
-        let runtimeStyle = document.getElementById('runtime-overrides');
+        var runtimeStyle = document.getElementById('runtime-overrides');
         if (!runtimeStyle) {
             runtimeStyle = document.createElement('style');
             runtimeStyle.id = 'runtime-overrides';
-            runtimeStyle.innerHTML = `
-                /* Runtime CSS overrides - highest priority */
-                .fillable.svelte-16faplo.svelte-16faplo:not(.fill_width) {
-                    max-width: none !important;
-                    width: 100% !important;
-                    padding: 0 !important;
-                }
-                .gradio-container, .app, .fillable, .main-wrap, .wrap, .contain, .main, .block, .form {
-                    max-width: none !important;
-                    width: 100% !important;
-                    padding: 0 !important;
-                    margin: 0 !important;
-                }
-                [role="tablist"] {
-                    display: flex !important;
-                    visibility: visible !important;
-                }
-                [role="tab"] {
-                    display: inline-flex !important;
-                    visibility: visible !important;
-                }
-                [role="tabpanel"] {
-                    display: block !important;
-                    visibility: visible !important;
-                }
-                :root {
-                    --size-4: 0px !important;
-                    --size-8: 0px !important;
-                    --spacing-sm: 0px !important;
-                    --spacing-md: 0px !important;
-                    --spacing-lg: 0px !important;
-                }
-                
-                /* Hide default Gradio footer and social elements */
-                footer:not(.custom-footer) {
-                    display: none !important;
-                }
-                
-                a[href*="twitter"], a[href*="linkedin"], a[href*="youtube"], 
-                a[href*="instagram"], a[href*="facebook"], 
-                .scroll-to-top, .go-to-top,
-                .social-links, .social-media {
-                    display: none !important;
-                }
-                
-                /* Ensure custom styles always override */
-                body * {
-                    box-sizing: border-box;
-                }
-            `;
+            runtimeStyle.innerHTML = '/* Runtime CSS overrides - highest priority */ .fillable.svelte-16faplo.svelte-16faplo:not(.fill_width) { max-width: none !important; width: 100% !important; padding: 0 !important; } .gradio-container, .app, .fillable, .main-wrap, .wrap, .contain, .main, .block, .form { max-width: none !important; width: 100% !important; padding: 0 !important; margin: 0 !important; } [role="tablist"] { display: flex !important; visibility: visible !important; } [role="tab"] { display: inline-flex !important; visibility: visible !important; } [role="tabpanel"] { display: block !important; visibility: visible !important; } :root { --size-4: 0px !important; --size-8: 0px !important; --spacing-sm: 0px !important; --spacing-md: 0px !important; --spacing-lg: 0px !important; } footer:not(.custom-footer) { display: none !important; } a[href*="twitter"], a[href*="linkedin"], a[href*="youtube"], a[href*="instagram"], a[href*="facebook"], .scroll-to-top, .go-to-top, .social-links, .social-media { display: none !important; } body * { box-sizing: border-box; }';
             document.head.appendChild(runtimeStyle);
         }
         
@@ -460,26 +457,9 @@ with gr.Blocks(
     setTimeout(ensureCustomStyling, 2000);  // Late catch
     setTimeout(ensureCustomStyling, 5000);  // Final override
     
-    // Setup URL updating for tab changes
-    setTimeout(updateURLOnTabChange, 1000);  // Setup after tabs are ready
-    
-    // Call tab switching function multiple times to ensure it works
-    setTimeout(switchToTabFromURL, 500);   // Early attempt
-    setTimeout(switchToTabFromURL, 1500);  // After tabs are ready
-    setTimeout(switchToTabFromURL, 3000);  // Final attempt
-    
-    // Test tab routes after tabs are loaded (only in development)
-    setTimeout(() => {
-      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        testAllTabRoutes();
-      }
-    }, 2000);
-    
     // Monitor for DOM changes and reapply styling
-    const observer = new MutationObserver(() => {
+    var observer = new MutationObserver(function() {
         setTimeout(ensureCustomStyling, 100);
-        setTimeout(updateURLOnTabChange, 200);  // Re-setup URL updating after DOM changes
-        setTimeout(switchToTabFromURL, 300);    // Re-check tab switching after DOM changes
     });
     observer.observe(document.body, {
         childList: true,

@@ -76,7 +76,7 @@ def generate_css_debug_snippet():
 // CSS Debug Tools - Paste in browser console
 
 // 1. Check CSS loading order
-function checkCSSOrder() {
+const checkCSSOrder = () => {
     const stylesheets = Array.from(document.styleSheets);
     console.log('CSS Loading Order:');
     stylesheets.forEach((sheet, index) => {
@@ -88,10 +88,10 @@ function checkCSSOrder() {
     const runtimeCSS = document.getElementById('runtime-overrides');
     console.log('Custom CSS element:', customCSS ? '✅ Found' : '❌ Missing');
     console.log('Runtime CSS element:', runtimeCSS ? '✅ Found' : '❌ Missing');
-}
+};
 
 // 2. Check for conflicting styles
-function checkConflicts(selector) {
+const checkConflicts = (selector) => {
     const elements = document.querySelectorAll(selector);
     if (elements.length === 0) {
         console.log(`No elements found for: ${selector}`);
@@ -107,10 +107,10 @@ function checkConflicts(selector) {
             margin: styles.margin
         });
     });
-}
+};
 
 // 3. Force reapply custom styles
-function forceCustomStyles() {
+const forceCustomStyles = () => {
     const customCSS = document.getElementById('custom-css-override');
     if (customCSS) {
         document.head.appendChild(customCSS);
@@ -118,14 +118,14 @@ function forceCustomStyles() {
     } else {
         console.log('❌ Custom CSS not found');
     }
-}
+};
 
 // 4. Test specific elements
-function testElements() {
+const testElements = () => {
     checkConflicts('.gradio-container');
     checkConflicts('.paper-card');
     checkConflicts('[role="tab"]');
-}
+};
 
 console.log('CSS Debug tools loaded. Available functions:');
 console.log('- checkCSSOrder()');

@@ -230,6 +230,11 @@ div[role="tabpanel"] {
     visibility: visible !important;
 }
 
+div#component-4{
+    box-shadow: none !important;
+    width: 98% !important;
+}
+
 div.svelte-1nguped, .block.svelte-1ezsyiy{
     background: transparent !important;
     border: 0 !important;
