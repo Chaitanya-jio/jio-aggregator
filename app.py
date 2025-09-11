@@ -177,7 +177,7 @@ footer_loading_js = """
                                     <li><a href="https://www.moonshotmatter.com">Home</a></li>
                                     <li><a href="https://research.moonshotmatter.com">Research</a></li>
                                     <li><a href="https://trends.moonshotmatter.com">Trends</a></li>
-                                    <li><a href="https://blog.moonshotmatter.com">Blog</a></li>
+                                    <li><a href="https://moonshotmatter.com/blog/blog-grid/">Blog</a></li>
                                     <li><a href="https://moonshotmatter.com/company/contact-us/">Contact us</a></li>
                                 </ul>
                             </div>
