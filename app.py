@@ -469,6 +469,20 @@ with gr.Blocks(
     });
     """)
     
+    # Set the page title and favicon at runtime to 'moonshotmatter'
+    demo.load(None, js="""
+    () => {
+        try {
+            document.title = "Moonshotmatter";
+            var link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+            link.type = 'image/png';
+            link.rel = 'icon';
+            link.href = 'https://moonshotmatter.com/wp-content/uploads/2025/09/Screenshot-2025-09-05-at-2.58.24%E2%80%AFPM.png';
+            if (!document.querySelector("link[rel*='icon']")) document.head.appendChild(link);
+        } catch(e) { console.error('favicon/title set error', e); }
+    }
+    """)
+
 
 # Ensure static directory exists
 static_dir = Path("static")

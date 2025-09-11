@@ -124,7 +124,7 @@ label.container span{
 /* ===== HEADER STYLES ===== */
 .header-container {
     background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
-    padding: 24px 10px !important;
+    padding: 24px 10px 48px 10px !important;
     margin: 0 !important;
     border-bottom: 1px solid #e2e8f0 !important;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
@@ -132,7 +132,7 @@ label.container span{
 
 .gradio-container.gradio-container-5-38-1 .contain .header-container{
     background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
-    padding: 24px 10px !important;
+    padding: 24px 10px 48px 10px !important;
     margin: 0 !important;
     border-bottom: 1px solid #e2e8f0 !important;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
@@ -156,7 +156,7 @@ label.container span{
 .logo-img {
     width: 50px !important;
     height: 50px !important;
-    border-radius: 8px !important;
+    /* border-radius: 8px !important; */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
 }
 
@@ -239,7 +239,7 @@ div.svelte-1nguped, .block.svelte-1ezsyiy{
     background: transparent !important;
     border: 0 !important;
 }
-label span{
+label.container span{
     color: #64748b !important;
 }
 label span:hover{
@@ -540,7 +540,7 @@ label span:focus-visible{
 .footer-logo-img {
     width: 80px !important;
     height: 80px !important;
-    border-radius: 8px !important;
+    /* border-radius: 8px !important; */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
 }
 
